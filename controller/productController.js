@@ -8,9 +8,9 @@ const ApiError = require('../utils/ApiError')
 const createProduct = catchAsync(async (req, res) => {
     const { name, price, stock } = req.body
 
-    if(name.length < 10) {
-        throw new ApiError(httpStatus.BAD_REQUEST, `Product name must be more than 10 character`)
-    }
+    // if(name.length < 10) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, `Product name must be more than 10 character`)
+    // }
 
     const [product, created] = await Product.findOrCreate({
         where: { name },
@@ -33,7 +33,6 @@ const createProduct = catchAsync(async (req, res) => {
     }
 
     await Stock.create({
-        name,
         type: 'Incoming',
         stock,
         transactionDate: product.createdAt,
@@ -49,7 +48,11 @@ const createProduct = catchAsync(async (req, res) => {
 })
 
 const findAllProducts = catchAsync(async (req, res) => {
-    const products = await Product.findAll()
+    const products = await Product.findAll({
+        order: [
+            ['id', 'ASC'],
+        ]
+    })
     res.status(200).json({
         status: 'Success',
         data: {
@@ -62,7 +65,7 @@ const findProductsByOwnership = catchAsync(async (req, res) => {
     const products = await Product.findAll({
         where: {
             warehouseId: req.user.warehouseId
-        }
+        },
     })
     res.status(200).json({
         status: 'Success',
@@ -115,10 +118,11 @@ const findProductById = catchAsync(async (req, res) => {
 })
 
 const updateProduct = catchAsync(async (req, res) => {
-    const { name, price, stock } = req.body
+    console.log(req.body)
+    const { name, price, stock } = req.body.product
     const id = req.params.id
 
-    const product = Product.findProduct(id)
+    const product = await Product.findProduct(id)
 
     if (!product) {
         throw new ApiError(httpStatus.NOT_FOUND, `Product with this id ${id} is not found`)
@@ -144,7 +148,9 @@ const updateProduct = catchAsync(async (req, res) => {
 const deleteProduct = catchAsync(async (req, res) => {
     const id = req.params.id
 
-    const product = Product.findProduct(id)
+    const product = await Product.findProduct(id)
+
+    console.log(product)
 
     if (!product) {
         throw new ApiError(httpStatus.NOT_FOUND, `Product with this id ${id} is not found`)
@@ -158,7 +164,7 @@ const deleteProduct = catchAsync(async (req, res) => {
 
     res.status(200).json({
         status: 'Success',
-        message: `Product dengan id ${id} terhapus`
+        message: `Product ${product.name} terhapus`
     })
 })
 
