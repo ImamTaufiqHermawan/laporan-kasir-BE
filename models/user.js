@@ -50,6 +50,17 @@ module.exports = (sequelize, DataTypes) => {
         }
       )
       return user
+    },
+    User.findUserById = async function (value) {
+      console.log("ini instance method")
+      const user = await User.findOne(
+        {
+          where: {
+            id: value
+          }
+        }
+      )
+      return user
     });
 
   User.associate = function (models) {
