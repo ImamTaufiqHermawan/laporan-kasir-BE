@@ -9,6 +9,6 @@ router.post('/', User.createUser)
 // router.get('/ownership', checkRole('Admin'), Product.findProductsByOwnership)
 router.get('/:id', User.findUserById)
 router.put('/:id', User.updateUser)
-// router.delete('/:id', Product.deleteProduct)
+router.delete('/:id', User.deleteUser)
 
 module.exports = router

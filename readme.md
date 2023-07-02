@@ -13,9 +13,9 @@ jangan lupa config env
 ## run sequelize
 
 ```
-sequelize db:create (kalau gk ada db nya)
-sequelize db:migrate
-sequelize db:seed:all
+npx sequelize db:create (kalau gk ada db nya)
+npx sequelize db:migrate
+npx sequelize db:seed:all
 ```
 
 ## Jalankan server

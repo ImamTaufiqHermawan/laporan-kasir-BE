@@ -107,7 +107,7 @@ const findUserById = catchAsync(async (req, res) => {
      const user = await User.findUserById(id)
 
      if (!user) {
-         throw new ApiError(httpStatus.NOT_FOUND, `Users with this id ${id} is not found`)
+         throw new ApiError(httpStatus.NOT_FOUND, `User with this id ${id} is not found`)
      }
 
      await User.update({
@@ -126,28 +126,28 @@ const findUserById = catchAsync(async (req, res) => {
      })
  })
 
-// const deleteProduct = catchAsync(async (req, res) => {
-//     const id = req.params.id
+const deleteUser = catchAsync(async (req, res) => {
+    const id = req.params.id
 
-//     const product = await Product.findProduct(id)
+    const user = await User.findUserById(id)
 
-//     console.log(product)
+    console.log(user)
 
-//     if (!product) {
-//         throw new ApiError(httpStatus.NOT_FOUND, `Product with this id ${id} is not found`)
-//     }
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, `User with this id ${id} is not found`)
+    }
 
-//     await Product.destroy({
-//         where: {
-//             id
-//         }
-//     })
+    await User.destroy({
+        where: {
+            id
+        }
+    })
 
-//     res.status(200).json({
-//         status: 'Success',
-//         message: `Product ${product.name} terhapus`
-//     })
-// })
+    res.status(200).json({
+        status: 'Success',
+        message: `User ${user.name} terhapus`
+    })
+})
 
 module.exports = {
     createUser,
@@ -155,6 +155,6 @@ module.exports = {
     findAllUsers,
     findUserById,
     updateUser,
-    // deleteProduct,
+    deleteUser,
     // searchProduct,
 }

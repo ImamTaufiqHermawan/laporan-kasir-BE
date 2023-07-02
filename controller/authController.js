@@ -69,18 +69,10 @@ const login = catchAsync(async (req, res) => {
     const user = await User.findOne({
         where: {
             email
-        },
-        include: [
-            {
-                model: Warehouse,
-            },
-            {
-                model: Profile
-            }
-        ]
+        }
+        
     })
 
-    console.log(user.Profile.role)
 
     // gagal melanjutkan karena username nya tidak ada 
     if (!user) {
@@ -93,9 +85,7 @@ const login = catchAsync(async (req, res) => {
         // generate token utk user yg success login
         const token = jwt.sign({
             id: user.id,
-            username: user.username,
-            warehouseId: user.warehouseId,
-            role: user.Profile.role
+            username: user.username
         }, 'rahasia')
 
         res.status(200).json({
@@ -103,7 +93,6 @@ const login = catchAsync(async (req, res) => {
             data: {
                 username: user.name,
                 email: user.email,
-                warehouse: user.Warehouse.name,
                 token
             }
         })
