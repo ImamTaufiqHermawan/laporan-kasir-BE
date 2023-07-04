@@ -9,7 +9,7 @@ const user = require('../models/user')
 
 const createUser = catchAsync(async (req, res) => {
     // destructuring
-    const { email, password, name } = req.body
+    const { email, password, name, role } = req.body
 
     // enkripsi password
     const hashedPassword = bcrypt.hashSync(password, 10)
@@ -18,6 +18,7 @@ const createUser = catchAsync(async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        role
     })
 
     res.status(201).json({

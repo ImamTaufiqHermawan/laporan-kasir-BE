@@ -93,6 +93,7 @@ const login = catchAsync(async (req, res) => {
             data: {
                 username: user.name,
                 email: user.email,
+                role: user.role,
                 token
             }
         })

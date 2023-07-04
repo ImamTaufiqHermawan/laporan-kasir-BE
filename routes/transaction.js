@@ -16,6 +16,7 @@ router.get('/search', Product.searchProduct)
 router.get('/ownership', checkRole('Admin'), Product.findProductsByOwnership)
 router.get('/:id', Product.findProductById)
 router.put('/:id', Product.updateProduct)
+router.put('/:id', Transaction.updateTransaction)
 router.delete('/:id', Product.deleteProduct)
 
 module.exports = router
