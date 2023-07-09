@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: false,
         },
       });
+      this.belongsTo(models.User, {
+        foreignKey: {
+          name: "userId",
+          allowNull: false,
+        },
+      });
     }
   }
   Transaction.init({
@@ -32,6 +38,17 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Transaction',
-  });
+  },
+    Transaction.findTransaction = async function (value) {
+      const transaction = await Transaction.findOne(
+        {
+          where: {
+            id: value
+          }
+        }
+      )
+      return transaction
+    }
+  );
   return Transaction;
 };

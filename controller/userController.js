@@ -101,7 +101,7 @@ const findUserById = catchAsync(async (req, res) => {
 
  const updateUser = catchAsync(async (req, res) => {
      console.log(req.body)
-     const { name, email } = req.body.user
+     const { role } = req.body
      const id = req.params.id
 
     //  proses cari user by id
@@ -112,8 +112,7 @@ const findUserById = catchAsync(async (req, res) => {
      }
 
      await User.update({
-         name,
-         email
+         role
      }, {
          where: {
              id
@@ -122,7 +121,7 @@ const findUserById = catchAsync(async (req, res) => {
      res.status(200).json({
          status: 'Success',
          data: {
-             id, name, email
+             id, role
          }
      })
  })

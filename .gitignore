@@ -4,3 +4,4 @@ node_modules
 # credential jgn di push
 .env
 
+test.js

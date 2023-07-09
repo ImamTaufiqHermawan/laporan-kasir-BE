@@ -13,10 +13,8 @@ const checkOwnership = require('../middlewares/checkCredentials')
 router.get('/', Transaction.findAllTransactions)
 router.post('/', Transaction.createTransaction)
 router.get('/search', Product.searchProduct)
-router.get('/ownership', checkRole('Admin'), Product.findProductsByOwnership)
-router.get('/:id', Product.findProductById)
-router.put('/:id', Product.updateProduct)
+router.get('/:id', Transaction.findTransactionById)
 router.put('/:id', Transaction.updateTransaction)
-router.delete('/:id', Product.deleteProduct)
+router.delete('/:id', Transaction.deleteTransaction)
 
 module.exports = router

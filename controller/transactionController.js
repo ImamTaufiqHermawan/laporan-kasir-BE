@@ -1,5 +1,5 @@
 const httpStatus = require('http-status')
-const { Transaction, Stock, Product } = require('../models')
+const { Transaction, Stock, Product, User } = require('../models')
 const { Op } = require('sequelize')
 
 const imagekit = require('../lib/imageKit')
@@ -46,10 +46,18 @@ const createTransaction = catchAsync(async (req, res) => {
 const findAllTransactions = catchAsync(async (req, res) => {
     const transactions = await Transaction.findAll(
         {
-            include: {
-                model: Product,
-            },
-        }
+            include: [
+                {
+                    model: Product,
+                },
+                {
+                    model: User,
+                }
+            ],
+            order: [
+                ['id', 'ASC'],
+            ]
+        },
     )
     res.status(200).json({
         status: 'Success',
@@ -95,20 +103,22 @@ const searchProduct = catchAsync(async (req, res) => {
     })
 })
 
-const findProductById = catchAsync(async (req, res) => {
+const findTransactionById = catchAsync(async (req, res) => {
     const id = req.params.id
-    const product = await Product.findByPk(id)
+    const transaction = await Transaction.findByPk(id, {
+        include: {
+            model: Product,
+        },
+    })
 
-    console.log(product)
-
-    if (!product) {
-        throw new ApiError(httpStatus.NOT_FOUND, `Product with this id ${id} is not found`)
+    if (!transaction) {
+        throw new ApiError(httpStatus.NOT_FOUND, `Transaction with this id ${id} is not found`)
     }
 
     res.status(200).json({
         status: 'Success',
         data: {
-            product
+            transaction
         }
     })
 })
@@ -141,12 +151,12 @@ const updateProduct = catchAsync(async (req, res) => {
 })
 
 const updateTransaction = catchAsync(async (req, res) => {
-    const { productId, quantity, transactionDate, shift, totalPrice } = req.body
+    const { productId, quantity, transactionDate, shift, totalPrice, userId } = req.body
     const id = req.params.id
 
-    const product = Product.findProduct(id)
+    const transaction = Transaction.findTransaction(id)
 
-    if (!product) {
+    if (!transaction) {
         throw new ApiError(httpStatus.NOT_FOUND, `Transaction with this id ${id} is not found`)
     }
 
@@ -155,7 +165,8 @@ const updateTransaction = catchAsync(async (req, res) => {
         quantity,
         transactionDate,
         shift,
-        totalPrice
+        totalPrice,
+        userId
     }, {
         where: {
             id
@@ -170,16 +181,16 @@ const updateTransaction = catchAsync(async (req, res) => {
 })
 
 
-const deleteProduct = catchAsync(async (req, res) => {
+const deleteTransaction = catchAsync(async (req, res) => {
     const id = req.params.id
 
-    const product = Product.findProduct(id)
+    const transaction = Transaction.findTransaction(id)
 
-    if (!product) {
-        throw new ApiError(httpStatus.NOT_FOUND, `Product with this id ${id} is not found`)
+    if (!transaction) {
+        throw new ApiError(httpStatus.NOT_FOUND, `Transaction with this id ${id} is not found`)
     }
 
-    await Product.destroy({
+    await Transaction.destroy({
         where: {
             id
         }
@@ -187,7 +198,7 @@ const deleteProduct = catchAsync(async (req, res) => {
 
     res.status(200).json({
         status: 'Success',
-        message: `Product dengan id ${id} terhapus`
+        message: `Transaction dengan id ${id} terhapus`
     })
 })
 
@@ -195,9 +206,9 @@ module.exports = {
     createTransaction,
     findProductsByOwnership,
     findAllTransactions,
-    findProductById,
+    findTransactionById,
     updateProduct,
     updateTransaction,
-    deleteProduct,
+    deleteTransaction,
     searchProduct,
 }
