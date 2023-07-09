@@ -17,7 +17,6 @@ module.exports = {
         name: 'Lisma',
         email: 'lisma@gmail.com',
         password: '$2a$10$7nwqtWYWGDbeAvOU2sfyEeu0XLKCqxWT0A2NVkJ/Ml1.bfTW7pkZu',
-        phone_number: '08123456789',
         role: "Manager",
         createdAt: new Date(),
         updatedAt: new Date()
