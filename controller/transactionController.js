@@ -17,6 +17,7 @@ const createTransaction = catchAsync(async (req, res) => {
         transactionDate,
         shift,
         totalPrice,
+        userId: req.user.id
     })
 
     const updatedStock = await Stock.create({
