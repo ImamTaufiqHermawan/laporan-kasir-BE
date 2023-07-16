@@ -1,10 +1,13 @@
 const httpStatus = require('http-status')
 const { Transaction, Stock, Product, User } = require('../models')
 const { Op } = require('sequelize')
+const ExcelJS = require('exceljs');
 
 const imagekit = require('../lib/imageKit')
 const catchAsync = require('../utils/catchAsync')
-const ApiError = require('../utils/ApiError')
+const ApiError = require('../utils/ApiError');
+const formatDate = require('../utils/date');
+const rupiah = require('../utils/price');
 
 const createTransaction = catchAsync(async (req, res) => {
     const { productId, quantity, transactionDate, shift, totalPrice } = req.body
@@ -45,13 +48,57 @@ const createTransaction = catchAsync(async (req, res) => {
 })
 
 const findAllTransactions = catchAsync(async (req, res) => {
-    const { date, name } = req.query
+    const { date, name } = req.query;
+    let { page, limit } = req.query;
 
     const condition = {};
     if (date) condition.transactionDate = new Date(date);
 
     const includeCondition = {};
-    if (name) includeCondition.name = name;
+    if (name) includeCondition.name = { [Op.iLike]: `${name}%` };;
+
+    page = page ? parseInt(page) : 1;
+    limit = limit ? parseInt(limit) : 10;
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Transaction.findAndCountAll(
+        {
+            include: [
+                {
+                    model: Product,
+                    where: includeCondition
+                },
+                {
+                    model: User,
+                }
+            ],
+            where: condition,
+            order: [
+                ['id', 'ASC'],
+            ],
+            offset,
+            limit
+        },
+    )
+
+    const totalPages = Math.ceil(count / limit);
+
+    res.status(200).json({
+        status: 'Success',
+        data: rows,
+        totalPages
+    })
+})
+
+const exportTransactions = catchAsync(async (req, res) => {
+    const { date, name } = req.query;
+
+    const condition = {};
+    if (date) condition.transactionDate = new Date(date);
+
+    const includeCondition = {};
+    if (name) includeCondition.name = { [Op.iLike]: `${name}%` };;
 
     const transactions = await Transaction.findAll(
         {
@@ -67,13 +114,55 @@ const findAllTransactions = catchAsync(async (req, res) => {
             where: condition,
             order: [
                 ['id', 'ASC'],
-            ]
+            ],
         },
     )
-    res.status(200).json({
-        status: 'Success',
-        data: transactions
-    })
+
+    console.log(transactions)
+
+    // Create a new workbook
+    const workbook = new ExcelJS.Workbook();
+
+    // Add a worksheet
+    const worksheet = workbook.addWorksheet('Transactions');
+
+    // Define headers
+    worksheet.columns = [
+        { header: 'ID', key: 'id' },
+        { header: 'Nama Produk', key: 'nama_produk' },
+        { header: 'Harga Satuan', key: 'harga' },
+        { header: 'Jumlah', key: 'quantity' },
+        { header: 'Total Harga', key: 'total_harga' },
+        { header: 'Tanggal Transaksi', key: 'tanggal_transaksi' },
+        { header: 'Tanggal Input', key: 'tanggal_input' },
+        { header: 'Shift', key: 'shift' },
+        { header: 'Nama Pegawai', key: 'pegawai' },
+    ];
+
+    // Add rows
+    transactions.forEach((transaction) => {
+        worksheet.addRow({
+            id: transaction.id,
+            nama_produk: transaction.Product.name,
+            harga: rupiah(transaction.Product.price),
+            quantity: transaction.quantity,
+            total_harga: rupiah(transaction.totalPrice),
+            tanggal_transaksi: formatDate(transaction.transactionDate),
+            tanggal_input: formatDate(transaction.createdAt),
+            shift: transaction.shift,
+            pegawai: transaction?.User?.name
+        });
+    });
+
+    // Generate the Excel file buffer
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    // Set response headers
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=transactions.xlsx');
+
+    // Send the file as response
+    res.send(buffer)
 })
 
 const findProductsByOwnership = catchAsync(async (req, res) => {
@@ -222,4 +311,5 @@ module.exports = {
     updateTransaction,
     deleteTransaction,
     searchProduct,
+    exportTransactions,
 }
