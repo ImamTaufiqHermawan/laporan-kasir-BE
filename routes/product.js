@@ -9,14 +9,12 @@ const Uploader = require('../middlewares/uploader')
 const checkRole = require('../middlewares/checkRole')
 const checkOwnership = require('../middlewares/checkCredentials')
 
-router.get('/', Product.findAllProducts)
-router.post('/',
-    Product.createProduct
-)
+router.get('/',  Authentication, Product.findAllProducts)
+router.post('/',  Authentication, checkRole("Manager"), Product.createProduct)
 router.get('/search', Product.searchProduct)
 router.get('/ownership', checkRole('Admin'), Product.findProductsByOwnership)
 router.get('/:id', Product.findProductById)
-router.put('/:id', Product.updateProduct)
-router.delete('/:id', Product.deleteProduct)
+router.put('/:id', Authentication, checkRole("Manager"), Product.updateProduct)
+router.delete('/:id',  Authentication, checkRole("Manager"), Product.deleteProduct)
 
 module.exports = router

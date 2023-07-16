@@ -45,16 +45,26 @@ const createTransaction = catchAsync(async (req, res) => {
 })
 
 const findAllTransactions = catchAsync(async (req, res) => {
+    const { date, name } = req.query
+
+    const condition = {};
+    if (date) condition.transactionDate = new Date(date);
+
+    const includeCondition = {};
+    if (name) includeCondition.name = name;
+
     const transactions = await Transaction.findAll(
         {
             include: [
                 {
                     model: Product,
+                    where: includeCondition
                 },
                 {
                     model: User,
                 }
             ],
+            where: condition,
             order: [
                 ['id', 'ASC'],
             ]
