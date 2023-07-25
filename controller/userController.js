@@ -99,32 +99,66 @@ const findUserById = catchAsync(async (req, res) => {
     })
 })
 
- const updateUser = catchAsync(async (req, res) => {
-     console.log(req.body)
-     const { role } = req.body
-     const id = req.params.id
+const updateUser = catchAsync(async (req, res) => {
+    const id = req.params.id
+    const file = req.file
+
+    // proses jika ada update poto profile
+    if (file) {
+        // validasi utk format file image
+        const validFormat = file.mimetype == 'image/png' || file.mimetype == 'image/jpg' || file.mimetype == 'image/jpeg' || file.mimetype == 'image/gif';
+        if (!validFormat) {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong Image Format')
+        }
+
+        // untuk dapat extension file nya
+        const split = file.originalname.split('.')
+        const ext = split[split.length - 1]
+
+        // upload file ke imagekit
+        const img = await imagekit.upload({
+            file: file.buffer, //required
+            fileName: `IMG-${Date.now()}.${ext}`, //required
+        })
+    }
 
     //  proses cari user by id
-     const user = await User.findUserById(id)
+    const user = await User.findUserById(id)
 
-     if (!user) {
-         throw new ApiError(httpStatus.NOT_FOUND, `User with this id ${id} is not found`)
-     }
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, `User with this id ${id} is not found`)
+    }
 
-     await User.update({
-         role
-     }, {
-         where: {
-             id
-         }
-     })
-     res.status(200).json({
-         status: 'Success',
-         data: {
-             id, role
-         }
-     })
- })
+    // enkripsi password
+    let hashedPassword;
+    if (req?.body?.password) {
+        hashedPassword = bcrypt.hashSync(password, 10);
+        await User.update({
+            password: hashedPassword
+        }, {
+            where: {
+                id
+            }
+        })
+    }
+
+    await User.update({
+        name: req?.body?.name,
+        email: req?.body?.email,
+        role: req?.body?.role,
+        profilePic: img?.url,
+    }, {
+        where: {
+            id
+        }
+    })
+    res.status(200).json({
+        status: 'Success',
+        data: {
+            id, role
+        }
+    })
+})
 
 const deleteUser = catchAsync(async (req, res) => {
     const id = req.params.id
