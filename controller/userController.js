@@ -103,7 +103,7 @@ const updateUser = catchAsync(async (req, res) => {
     const id = req.params.id
     const file = req.file
     let img;
-    
+
     // proses jika ada update poto profile
     if (file) {
         // validasi utk format file image
@@ -155,9 +155,7 @@ const updateUser = catchAsync(async (req, res) => {
     })
     res.status(200).json({
         status: 'Success',
-        data: {
-            id, role
-        }
+        message: 'Sukse update Profile'
     })
 })
 
