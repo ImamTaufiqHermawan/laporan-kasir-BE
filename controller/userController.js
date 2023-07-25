@@ -102,7 +102,8 @@ const findUserById = catchAsync(async (req, res) => {
 const updateUser = catchAsync(async (req, res) => {
     const id = req.params.id
     const file = req.file
-
+    let img;
+    
     // proses jika ada update poto profile
     if (file) {
         // validasi utk format file image
@@ -116,7 +117,7 @@ const updateUser = catchAsync(async (req, res) => {
         const ext = split[split.length - 1]
 
         // upload file ke imagekit
-        const img = await imagekit.upload({
+        img = await imagekit.upload({
             file: file.buffer, //required
             fileName: `IMG-${Date.now()}.${ext}`, //required
         })
