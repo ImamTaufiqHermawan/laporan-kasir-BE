@@ -168,10 +168,54 @@ const deleteProduct = catchAsync(async (req, res) => {
     })
 })
 
+const findAllStocks = catchAsync(async (req, res) => {
+    console.log('ini stock api')
+    const { date, name } = req.query;
+    let { page, limit } = req.query;
+
+    const condition = {};
+    if (date) condition.transactionDate = new Date(date);
+
+    const includeCondition = {};
+    if (name) includeCondition.name = { [Op.iLike]: `${name}%` };;
+
+    page = page ? parseInt(page) : 1;
+    limit = limit ? parseInt(limit) : 10;
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Stock.findAndCountAll(
+        {
+            include: [
+                {
+                    model: Product,
+                    where: includeCondition
+                }
+            ],
+            where: condition,
+            order: [
+                ['id', 'ASC'],
+            ],
+            offset,
+            limit
+        },
+    )
+
+    const totalPages = Math.ceil(count / limit);
+
+    res.status(200).json({
+        status: 'Success',
+        data: rows,
+        totalPages,
+        count
+    })
+})
+
 module.exports = {
     createProduct,
     findProductsByOwnership,
     findAllProducts,
+    findAllStocks,
     findProductById,
     updateProduct,
     deleteProduct,

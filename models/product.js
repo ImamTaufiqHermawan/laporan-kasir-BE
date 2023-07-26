@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: false,
         },
       });
+      Product.hasMany(models.Stock, {
+        foreignKey: {
+          name: "productId",
+          allowNull: false,
+        },
+      });
     }
   }
   Product.init({

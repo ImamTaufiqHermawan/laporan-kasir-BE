@@ -104,6 +104,16 @@ const updateUser = catchAsync(async (req, res) => {
     const file = req.file
     let img;
 
+    console.log("ini request body")
+    console.log(req?.body)
+
+    //  proses cari user by id
+    const user = await User.findUserById(id)
+
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, `User with this id ${id} is not found`)
+    }
+
     // proses jika ada update poto profile
     if (file) {
         // validasi utk format file image
@@ -123,13 +133,6 @@ const updateUser = catchAsync(async (req, res) => {
         })
     }
 
-    //  proses cari user by id
-    const user = await User.findUserById(id)
-
-    if (!user) {
-        throw new ApiError(httpStatus.NOT_FOUND, `User with this id ${id} is not found`)
-    }
-
     // enkripsi password
     let hashedPassword;
     if (req?.body?.password) {
@@ -142,6 +145,9 @@ const updateUser = catchAsync(async (req, res) => {
             }
         })
     }
+
+    console.log("ini request body")
+    console.log(req?.body)
 
     await User.update({
         name: req?.body?.name,

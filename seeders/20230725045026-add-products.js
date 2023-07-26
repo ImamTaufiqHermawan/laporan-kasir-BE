@@ -12,20 +12,28 @@ module.exports = {
      * }], {});
     */
 
-    await queryInterface.bulkInsert('Users', [
+    await queryInterface.bulkInsert('Products', [
       {
-        name: 'Lisma',
-        email: 'lisma@gmail.com',
-        password: '$2a$10$7nwqtWYWGDbeAvOU2sfyEeu0XLKCqxWT0A2NVkJ/Ml1.bfTW7pkZu',
-        role: "Manager",
+        name: 'CFC 1',
+        price: 10000,
+        stock: 30,
+        userId: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        name: 'Imam',
-        email: 'imam@gmail.com',
-        password: '$2a$10$7nwqtWYWGDbeAvOU2sfyEeu0XLKCqxWT0A2NVkJ/Ml1.bfTW7pkZu',
-        role: "Staff",
+        name: 'CFC 2',
+        price: 20000,
+        stock: 30,
+        userId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: 'CFC 3',
+        price: 30000,
+        stock: 30,
+        userId: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       }

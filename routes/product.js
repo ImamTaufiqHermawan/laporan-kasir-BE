@@ -10,6 +10,7 @@ const checkRole = require('../middlewares/checkRole')
 const checkOwnership = require('../middlewares/checkCredentials')
 
 router.get('/',  Authentication, Product.findAllProducts)
+router.get('/stock', Product.findAllStocks)
 router.post('/',  Authentication, checkRole("Manager"), Product.createProduct)
 router.get('/search', Product.searchProduct)
 router.get('/ownership', checkRole('Admin'), Product.findProductsByOwnership)
