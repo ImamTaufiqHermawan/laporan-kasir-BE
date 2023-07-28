@@ -48,16 +48,36 @@ const createProduct = catchAsync(async (req, res) => {
 })
 
 const findAllProducts = catchAsync(async (req, res) => {
-    const products = await Product.findAll({
-        order: [
-            ['id', 'ASC'],
-        ]
-    })
+    const { date, name } = req.query;
+    let { page, limit } = req.query;
+
+    const condition = {};
+    if (date) condition.transactionDate = new Date(date);
+    if (name) condition.name = { [Op.iLike]: `${name}%` };;
+
+    page = page ? parseInt(page) : 1;
+    limit = limit ? parseInt(limit) : 10;
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Product.findAndCountAll(
+        {
+            where: condition,
+            order: [
+                ['id', 'ASC'],
+            ],
+            offset,
+            limit
+        }
+    )
+
+    const totalPages = Math.ceil(count / limit);
+
     res.status(200).json({
         status: 'Success',
-        data: {
-            products
-        }
+        data: rows,
+        count,
+        totalPages
     })
 })
 

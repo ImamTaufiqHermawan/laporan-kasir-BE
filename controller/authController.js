@@ -70,9 +70,9 @@ const login = catchAsync(async (req, res) => {
         where: {
             email
         }
-        
     })
 
+    console.log(user)
 
     // gagal melanjutkan karena username nya tidak ada 
     if (!user) {
@@ -85,16 +85,21 @@ const login = catchAsync(async (req, res) => {
         // generate token utk user yg success login
         const token = jwt.sign({
             id: user.id,
-            username: user.username
+            username: user.username,
+            role: user.role
         }, 'rahasia')
 
         res.status(200).json({
             status: 'Success',
             data: {
+                id: user.id,
                 username: user.name,
                 email: user.email,
                 role: user.role,
-                token
+                profilePic: user.profilePic,
+                token,
+                created: user.createdAt,
+                updated: user.updatedAt
             }
         })
     } else {

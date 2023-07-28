@@ -2,6 +2,7 @@ const httpStatus = require('http-status')
 const { User } = require('../models')
 const { Op } = require('sequelize')
 const bcrypt = require('bcrypt')
+const imagekit = require('../lib/imageKit')
 
 const catchAsync = require('../utils/catchAsync')
 const ApiError = require('../utils/ApiError')
@@ -136,7 +137,7 @@ const updateUser = catchAsync(async (req, res) => {
     // enkripsi password
     let hashedPassword;
     if (req?.body?.password) {
-        hashedPassword = bcrypt.hashSync(password, 10);
+        hashedPassword = bcrypt.hashSync(req?.body?.password, 10);
         await User.update({
             password: hashedPassword
         }, {
